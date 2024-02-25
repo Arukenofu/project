@@ -1,5 +1,14 @@
+<script lang="ts" setup>
+  onMounted(async () => {
+
+  })
+</script>
+
+
 <template>
-  <div>
-    <NuxtWelcome />
-  </div>
+  <nuxt-page />
 </template>
+
+<style lang="scss">
+@import "styles/global";
+</style>
