@@ -1,30 +1,51 @@
 <script setup lang="ts">
 
-const login = ref<{email: string, password: string}>({
+interface login {
+  email: string;
+  password: string;
+}
+
+const login = ref<login>({
   email: '',
   password: ''
 })
 
-const error = ref<string>('');
+const db = useSupabaseClient();
 
-const submit = async () => {
-  const {data} = await useFetch('/api/login', {
-    method: 'POST',
-    body: {
-      email: login.value.email,
-      password: login.value.password
-    }
-  });
+const submit = async(email: string, password: string) => {
+  // @ts-ignore
+  const {data, error} = await db.from('users').select('*').match({
+    email: email,
+    password: password
+  })
 
-  if (!data?.value) {
-    error.value = 'Неправильные данные'
-    return;
+  if (data?.length) {
+
+    const emailCookie = useCookie('email', {
+      expires: new Date(new Date().getTime() + 15 * 60000)
+    })!
+
+    emailCookie.value = data[0].email;
+
+    const loginCookie = useCookie('password', {
+      expires: new Date(new Date().getTime() + 15 * 60000)
+    })
+
+    loginCookie.value = data[0].username;
+
+    const passwordCookie = useCookie('username', {
+      expires: new Date(new Date().getTime() + 15 * 60000)
+    })
+
+    passwordCookie.value = data[0].password;
+
+    const router = useRouter();
+
+    router.push('/home')
+
+  } else {
+    alert('Неправильные данные')
   }
-
-  const router = useRouter();
-
-  await router.push('/home')
-
 }
 
 </script>
@@ -33,7 +54,7 @@ const submit = async () => {
   <div class="container">
     <h1>Вход в аккаунт</h1>
 
-    <form @submit.prevent="submit()">
+    <form @submit.prevent="submit(login.email, login.password)">
       <label for="email">
         Email
       </label>
@@ -49,7 +70,7 @@ const submit = async () => {
       </button>
 
       <div style="text-align: center; color: #ff4a4a; margin-top: 21px;">
-        {{error}}
+        {{}}
       </div>
 
       <nuxt-link style="text-align: center" to="/register">

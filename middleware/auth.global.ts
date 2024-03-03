@@ -6,18 +6,13 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     if (to.path === '/home') {
         const email = useCookie('email');
         const password = useCookie('password');
+        const db = useSupabaseClient();
 
-        const {data} = await useFetch('/api/login', {
-            method: 'POST',
-            body: {
-                email: email.value,
-                password: password.value
-            }
+
+        const {data} = await db.from('users').select('*').match({
+            email: email,
+            password: password
         });
-
-        if (!data?.value) {
-            return navigateTo('/login')
-        }
 
     }
 })

@@ -1,55 +1,53 @@
 <script setup lang="ts">
 
-const register = ref<{username: string, email: string, password: string}>({
+interface register {
+  username: string,
+  email: string,
+  password: string
+}
+
+const register = ref<register>({
   username: '',
   email: '',
   password: ''
-})
+});
 
-const error = ref<string>('');
+const db = useSupabaseClient();
 
-const submit = async () => {
-  if (register.value.username?.length < 4) {
-    alert('Длина имени не меньше 4')
-    return;
-  }
-  if (register.value.email?.length < 5) {
-    alert('Длина почты не меньше 5')
-    return;
-  }
-  if (register.value.password?.length < 5) {
-    alert('Длина пароля не меньше 6')
-    return;
-  }
+const submit = async (username: string, email: string, password: string) => {
 
-  const {data} = await useFetch('/api/register', {
-    method: 'POST',
-    body: {
-      username: register.value.username,
-      email: register.value.email,
-      password: register.value.password
+  // @ts-ignore
+  const {error} = await db.from('users').insert([
+    {
+      username: username,
+      email: email,
+      password: password
     }
-  });
+  ]);
 
-  console.log(data.value);
+  if (error) {
 
-  if (!data.value) {
-    alert('Неправильно!');
-    return;
+    register.value = {
+      username: '',
+      email: '',
+      password: ''
+    }
+
+    return alert(error.message);
   }
 
   const router = useRouter();
 
-  await router.push('/login')
-
+  router.push('/login');
 }
+
 </script>
 
 <template>
   <div class="container">
     <h1>Регистрация</h1>
 
-    <form @submit.prevent="submit()">
+    <form @submit.prevent="submit(register.username, register.email, register.password)">
       <label for="username">
         Username
       </label>
@@ -70,7 +68,7 @@ const submit = async () => {
       </button>
 
       <div style="text-align: center; color: #ff4a4a; margin-top: 21px;">
-        {{error}}
+        {{}}
       </div>
 
       <nuxt-link style="text-align: center" to="/login">

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 const username = useCookie('username');
 
 const deleteCookie = () => {
