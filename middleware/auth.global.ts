@@ -8,11 +8,17 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
         const password = useCookie('password');
         const db = useSupabaseClient();
 
-
         const {data} = await db.from('users').select('*').match({
             email: email,
             password: password
         });
 
+        console.log(data)
+
+        if (!data?.length) {
+            const router = useRouter();
+
+            await router.push('/login');
+        }
     }
 })
