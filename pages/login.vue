@@ -41,7 +41,7 @@ const submit = async(email: string, password: string) => {
 
     const router = useRouter();
 
-    router.push('/home')
+    await router.push('/home')
 
   } else {
     alert('Неправильные данные')

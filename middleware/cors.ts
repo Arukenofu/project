@@ -9,5 +9,4 @@ export default defineEventHandler((event) => {
     }
 
     setHeaders(event, headers)
-
 })
